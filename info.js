@@ -5,7 +5,35 @@ var chain = require('chain-node');
 exports.NAME = 'Chain.com';
 exports.SUPPORTED_MODULES = ['info'];
 
-var MINIMUM_PROPAGATION = .7;
+
+function countAll(array, address) {
+  return array.reduce(function(prev, current) {
+    if (current.addresses.indexOf(address) !== -1)
+      prev += current.value;
+
+    return prev;
+  }, 0);
+}
+
+// Iterates all in/outputs and counts how given tx changed address's balance
+function getAmountForAddress(address, tx) {
+  return countAll(tx.outputs, address) - countAll(tx.inputs, address);
+}
+
+function processTx(tx) {
+  return {
+    txHash: tx.hash,
+    tsReceived: Date.parse(tx.chain_received_at),
+    confirmations: tx.confirmations,
+    amount: getAmountForAddress(address, tx),
+    fees: tx.fees,
+
+    // NOTE: optional, shold be set when plugin implements 0-conf
+    authorized: false,
+    confidence: 0.0
+  };
+}
+
 
 exports.config = function config(localConfig) {
   if (localConfig) {
@@ -14,42 +42,23 @@ exports.config = function config(localConfig) {
   }
 };
 
-exports.getLastTx = function getLastTx(address, callback) {
+exports.getAddressLastTx = function getAddressLastTx(address, callback) {
   chain.getAddressTransactions(address, {limit: 1}, function(err, resp) {
     if (err)
       return callback(err);
 
     if (!resp.length)
-      return callback(); // no error & no data
+      return callback(); // no error & no tx
 
-    var tx = resp[0];
-    callback(null, {
-      txHash: tx.hash,
-      tsReceived: Date.parse(tx.chain_received_at),
-      confirmations: tx.confirmations,
-      amount: tx.amount,
-      fees: tx.fees
-    });
+    callback(null, processTx(resp[0]));
   });
 };
 
-// NOTE: this method is not aware of the expegted tx amount
-exports.getTxStatus = function getTxStatus(txHash, callback) {
+exports.getTx = function getTx(txHash, callback) {
   chain.getTransaction(txHash, function(err, resp) {
     if (err)
       return callback(err);
 
-    var status = null;
-    if (resp.confirmations > 0) status = 'confirmed';
-    else if (resp.propagation_level > MINIMUM_PROPAGATION) status = 'authorized';
-
-    if (!status)
-      return callback();
-
-    callback(null, {
-      status: status + 'Deposit',
-      confirmations: resp.confirmations,
-      confidence: resp.propagation_level
-    });
+    callback(null, processTx(resp));
   });
 };
