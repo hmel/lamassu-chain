@@ -20,7 +20,7 @@ function getAmountForAddress(address, tx) {
   return countAll(tx.outputs, address) - countAll(tx.inputs, address);
 }
 
-function processTx(tx) {
+function processTx(tx, address) {
   return {
     txHash: tx.hash,
     tsReceived: Date.parse(tx.chain_received_at),
@@ -50,15 +50,15 @@ exports.getAddressLastTx = function getAddressLastTx(address, callback) {
     if (!resp.length)
       return callback(); // no error & no tx
 
-    callback(null, processTx(resp[0]));
+    callback(null, processTx(resp[0], address));
   });
 };
 
-exports.getTx = function getTx(txHash, callback) {
+exports.getTx = function getTx(txHash, address, callback) {
   chain.getTransaction(txHash, function(err, resp) {
     if (err)
       return callback(err);
 
-    callback(null, processTx(resp));
+    callback(null, processTx(resp, address));
   });
 };
