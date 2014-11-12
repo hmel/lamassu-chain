@@ -1,0 +1,33 @@
+{
+  "name": "lamassu-blockchain",
+  "version": "0.0.1",
+  "description": "Lamassu Chain.com module",
+  "main": "info.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lamassu/lamassu-chain.git"
+  },
+  "keywords": [
+    "Lamassu",
+    "Chain",
+    "Bitcoin"
+  ],
+  "author": "Lamassu (https://lamassu.is)",
+  "license": "unlicence",
+  "bugs": {
+    "url": "https://github.com/lamassu/lamassu-chain/issues"
+  },
+  "devDependencies": {
+    "chai": "^1.9.1",
+    "mocha": "^1.21.4"
+  },
+  "dependencies": {
+    "async": "~0.2.10",
+    "chain-node": "^2.0.0",
+    "lodash": "^2.4.1",
+    "wreck": "^3.0.0"
+  }
+}
