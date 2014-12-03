@@ -1,6 +1,6 @@
 {
   "name": "lamassu-chain",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Lamassu Chain.com module",
   "main": "info.js",
   "scripts": {
